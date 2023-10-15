@@ -7,6 +7,7 @@ const app = express();
 const authenticationRoute = require("../src/routes/AuthenticationRoutes");
 const projectRoute = require("../src/routes/ProjectRoutes");
 const userRoute = require("../src/routes/UserRoutes");
+const followRoute = require("../src/routes/FollowRoutes");
 
 /** Use Cors */
 app.use(cors());
@@ -21,6 +22,7 @@ const PORT = 5000;
 app.use("/api/authentication", authenticationRoute);
 app.use("/api/project", projectRoute);
 app.use("/api/users", userRoute);
+app.use("/api/follow", followRoute);
 
 /** Start the server */
 app.listen(PORT, (err) => {
