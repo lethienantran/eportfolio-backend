@@ -15,7 +15,7 @@ async function SignUp(res, req) {
         }
 
         /** If validation pass, destructure variables from request body */
-        const {fullname, major, school, userPhoto, userEmail, username, password} = req;
+        const {fullname, major, school, userEmail, username, password} = req;
 
         /** Encrypt the password */
         const saltRounds = 10;
@@ -26,7 +26,6 @@ async function SignUp(res, req) {
             TXT_FULL_NAME: helpers.CapitalizeFirstLetter(fullname.trim().toLowerCase()),
             TXT_MAJOR: helpers.CapitalizeFirstLetter(major.trim().toLowerCase()),
             TXT_SCHOOL: helpers.CapitalizeFirstLetter(school.trim().toLowerCase()),
-            USR_PHOTO: userPhoto,
             USR_EMAIL: userEmail.toLowerCase().trim(),
             USR_USERNAME: username.toLowerCase().trim(),
             USR_PASSWORD: encryptedPassword,
@@ -47,8 +46,8 @@ async function SignUp(res, req) {
 /** Handles validation before while signing up */
 async function ValidateSignUpBody (res, req){
     /** Destructure variables from the request body */
-    const {fullname, major, school, userPhoto, userEmail, username, password} = req;
-    if (!fullname || !major || !school ||!userPhoto || !userEmail || !username || !password ) {
+    const {fullname, major, school, userEmail, username, password} = req;
+    if (!fullname || !major || !school || !userEmail || !username || !password ) {
         return responseBuilder.MissingContent(res);
     }
 
@@ -80,20 +79,19 @@ async function SignIn(res, req) {
         }
     
         /** If validations pass, destructure varaibles from the request body*/
-        const { username, password } = req;
+        const { username } = req;
 
         /** Get user based on username, it will return a list, but will expected to get 1 row only */
         const user = await dataRepos.GetUserInfoByUsername(db, username);
-
          /** Create response object */
         const responseObject = {
-            userId: user.PK_KEY_USR_ID,
-            fullname: user.TXT_FULL_NAME,
-            major: user.TXT_MAJOR,
-            school: user.TXT_SCHOOL,
-            userPhoto: user.USR_PHOTO,
-            userEmail: user.USR_EMAIL,
-            username: user.USR_USERNAME,
+            userId: user.userId,
+            fullname: user.fullname,
+            major: user.major,
+            school: user.school,
+            userImage: user.userImage,
+            email: user.email,
+            username: user.username,
         };
   
         /** Return get successful message */

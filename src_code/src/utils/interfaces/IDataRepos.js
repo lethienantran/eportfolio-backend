@@ -9,4 +9,6 @@ module.exports = {
     IsUserExistsById: dataRepos.IsUserExistsById,
     GetProjectCollaborators: dataRepos.GetProjectCollaborators,
     GetProjectInformation: dataRepos.GetProjectInformation,
+    IsProjectExists: dataRepos.IsProjectExists,
+    GetPhotoInformation: dataRepos.GetPhotoInformation
 }

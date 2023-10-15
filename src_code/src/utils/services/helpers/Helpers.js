@@ -25,6 +25,8 @@ function CapitalizeFirstLetter(str) {
     return words.join(" ");
   }
 
+
+  
   /** Exports the functions */
 module.exports = {
     CapitalizeFirstLetter,
