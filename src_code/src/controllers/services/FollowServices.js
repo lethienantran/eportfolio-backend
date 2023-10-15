@@ -88,8 +88,7 @@ async function ValidateUnfollow(res, followId) {
     const followRecord = await db
       .select()
       .from("follow")
-      .where("PK_KEY_FOLLOW_ID", followId)
-      .first();
+      .where("PK_KEY_FOLLOW_ID", followId);
     if (!followRecord && followRecord.length === 0) {
       return responseBuilder.BuildResponse(res, 404, {
         message: "You are not following this person.",

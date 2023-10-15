@@ -6,6 +6,37 @@ const dataRepos = require("../../utils/interfaces/IDataRepos");
 
 async function GetUserInformation(res, userId) {
   try {
+    const userFollowers = await db
+      .select()
+      .from("follow")
+      .where("FK_KEY_FOLLOW_USR_ID", "=", userId);
+    let userFollowersResponseObject = [];
+    if (userFollowers && userFollowers.length > 0) {
+      userFollowersResponseObject = userFollowers.map((userFollower) => {
+        return {
+          followId: userFollower.PK_KEY_FOLLOW_ID,
+          userId: userFollower.FK_KEY_USR_ID,
+          userFollowerId: userFollower.FK_KEY_FOLLOW_USR_ID,
+        };
+      });
+    }
+
+    const userFollowings = await db
+      .select()
+      .from("follow")
+      .where("FK_KEY_USR_ID", "=", userId);
+
+    let userFollowingsResponseObject = [];
+    if (userFollowings && userFollowings.length > 0) {
+      userFollowingsResponseObject = userFollowings.map((userFollowing) => {
+        return {
+          followId: userFollowing.PK_KEY_FOLLOW_ID,
+          userId: userFollowing.FK_KEY_USR_ID,
+          userFollowerId: userFollowing.FK_KEY_FOLLOW_USR_ID,
+        };
+      });
+    }
+
     const personalProjects = await db
       .select()
       .from("project")
@@ -80,6 +111,8 @@ async function GetUserInformation(res, userId) {
       username: user.username,
       personalProjects: personalProjectsResponseObject,
       collaborateProjects: collaborateProjectsResponseObject,
+      userFollowers: userFollowersResponseObject,
+      userFollowings: userFollowingsResponseObject,
     };
 
     return responseBuilder.GetSuccessful(
