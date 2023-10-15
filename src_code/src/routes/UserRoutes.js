@@ -42,5 +42,21 @@ router.put("/information", async (req, res) => {
   }
 });
 
+/**
+ * GET/RETRIEVE SEARCH USER
+ * URL => /api/users/search?username={username}
+ */
+router.get("/search", async (req, res) => {
+  try {
+    const username = req.query.username;
+    return await userServices.SearchUser(res, username);
+  } catch (error) {
+    console.log("ERROR WHILE SEARCHING AN USER: ", error);
+    return responseBuilder.ServerError(
+      res,
+      "Error occurred while searching an user."
+    );
+  }
+});
 /** Exports the router */
 module.exports = router;

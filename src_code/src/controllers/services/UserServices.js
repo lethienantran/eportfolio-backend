@@ -310,7 +310,39 @@ async function ValidateUpdateUserInformation(res, req) {
   }
 }
 
+async function SearchUser(res, username) {
+  try {
+    const users = await db
+      .select("USR_USERNAME AS username", "PK_KEY_USR_ID AS userId")
+      .from("user_account")
+      .whereRaw(`USR_USERNAME LIKE ?`, [`${username}%`]);
+
+    if (users.length === 0) {
+      // Handle the case when no users are found
+      return responseBuilder.BuildResponse(res, 200, {
+        responseObject: [],
+      });
+    }
+
+    const responseObject = users.map((user) => ({
+      username: user.username,
+      userId: user.userId,
+    }));
+
+    return responseBuilder.BuildResponse(res, 200, {
+      responseObject: responseObject,
+    });
+  } catch (error) {
+    console.log("ERROR WHILE SEARCHING USER BASED ON USERNAME: ", error);
+    return responseBuilder.ServerError(
+      res,
+      "Error occurred while searching user."
+    );
+  }
+}
+
 module.exports = {
   GetUserInformation,
   UpdateUserInformation,
+  SearchUser,
 };
