@@ -11,6 +11,7 @@ async function GetUserInformation(res, userId) {
       userFollowings,
       personalProjects,
       collaborateProjects,
+      ownCollaborateProjects,
       user,
     ] = await Promise.all([
       db.select().from("follow").where("FK_KEY_FOLLOW_USR_ID", "=", userId),
@@ -31,6 +32,10 @@ async function GetUserInformation(res, userId) {
           "project_collaborator.FK_KEY_PROJECT_ID"
         )
         .where("project_collaborator.FK_KEY_USR_ID", userId),
+      db("project")
+        .select("PK_KEY_PROJECT_ID", "FK_KEY_PHOTO_ID")
+        .where("PROJECT_TYPE", "=", "GP")
+        .where("FK_KEY_USR_ID", "=", userId),
       db
         .select(
           "PK_KEY_USR_ID",
@@ -84,10 +89,14 @@ async function GetUserInformation(res, userId) {
       );
     }
 
+    const allCollaborateProjects = collaborateProjects.concat(
+      ownCollaborateProjects
+    );
+
     let collaborateProjectsResponseObject = [];
-    if (collaborateProjects && collaborateProjects.length > 0) {
+    if (allCollaborateProjects && allCollaborateProjects.length > 0) {
       collaborateProjectsResponseObject = await Promise.all(
-        collaborateProjects.map(async (project) => {
+        allCollaborateProjects.map(async (project) => {
           const photoInfo = await dataRepos.GetPhotoInformation(
             db,
             project.FK_KEY_PHOTO_ID

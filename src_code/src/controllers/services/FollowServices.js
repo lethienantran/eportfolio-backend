@@ -49,6 +49,21 @@ async function ValidateFollow(res, req) {
         message: "You cannot followed yourself.",
       });
     }
+    const followingList = await db
+      .select()
+      .from("follow")
+      .where("FK_KEY_USR_ID", "=", userId);
+
+    const followingIds = followingList.map(
+      (follow) => follow.FK_KEY_FOLLOW_USR_ID
+    );
+
+    if (followingIds.includes(userBeingFollowedId)) {
+      return responseBuilder.BuildResponse(res, 400, {
+        message: "You are already following this user.",
+      });
+    }
+
     return null;
   } catch (error) {
     /** If there are errors occurred, return server error and log */
