@@ -235,7 +235,7 @@ async function UpdateUserInformation(res, req) {
         ),
         TXT_MAJOR: helpers.CapitalizeFirstLetter(major.trim().toLowerCase()),
         TXT_SCHOOL: helpers.CapitalizeFirstLetter(school.trim().toLowerCase()),
-        USR_EMAIL: userEmail.toLowerCase().trim(),
+        USR_EMAIL: email.toLowerCase().trim(),
       };
       await trx("user_account")
         .where("PK_KEY_USR_ID", userId)
