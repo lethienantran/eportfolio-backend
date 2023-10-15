@@ -96,10 +96,16 @@ async function GetUserInformation(res, userId) {
       .from("user_account")
       .where("PK_KEY_USR_ID", "=", userId)
       .first();
-    const photoInformation = await dataRepos.GetPhotoInformation(
-      db,
-      user.FK_KEY_PHOTO_ID
-    );
+
+    if (!user) {
+      return responseBuilder.BuildResponse(res, 404, {
+        message: "User is not exists.",
+      });
+    }
+    const photoInformation =
+      user.FK_KEY_PHOTO_ID === 0
+        ? null
+        : await dataRepos.GetPhotoInformation(db, user.FK_KEY_PHOTO_ID);
 
     const responseObject = {
       userId: user.PK_KEY_USR_ID,

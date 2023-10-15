@@ -25,7 +25,7 @@ router.get("/:userId/information", async (req, res) => {
 
 /**
  *  PUT/UPDATE USER INFORMATION
- *  URL => /api/users/{userId}/information
+ *  URL => /api/users/information
  */
 router.put("/information", async (req, res) => {
   try {
