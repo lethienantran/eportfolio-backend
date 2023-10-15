@@ -6,10 +6,46 @@ const dataRepos = require("../../utils/interfaces/IDataRepos");
 
 async function GetUserInformation(res, userId) {
   try {
-    const userFollowers = await db
-      .select()
-      .from("follow")
-      .where("FK_KEY_FOLLOW_USR_ID", "=", userId);
+    const [
+      userFollowers,
+      userFollowings,
+      personalProjects,
+      collaborateProjects,
+      user,
+    ] = await Promise.all([
+      db.select().from("follow").where("FK_KEY_FOLLOW_USR_ID", "=", userId),
+      db.select().from("follow").where("FK_KEY_USR_ID", "=", userId),
+      db
+        .select()
+        .from("project")
+        .where("FK_KEY_USR_ID", "=", userId)
+        .where("PROJECT_TYPE", "=", "SL"),
+      db("project_collaborator")
+        .select(
+          "project.PK_KEY_PROJECT_ID as PK_KEY_PROJECT_ID",
+          "project.FK_KEY_PHOTO_ID as FK_KEY_PHOTO_ID"
+        )
+        .leftJoin(
+          "project",
+          "project.PK_KEY_PROJECT_ID",
+          "project_collaborator.FK_KEY_PROJECT_ID"
+        )
+        .where("project_collaborator.FK_KEY_USR_ID", userId),
+      db
+        .select(
+          "PK_KEY_USR_ID",
+          "TXT_FULL_NAME",
+          "TXT_MAJOR",
+          "TXT_SCHOOL",
+          "FK_KEY_PHOTO_ID",
+          "USR_EMAIL",
+          "USR_USERNAME"
+        )
+        .from("user_account")
+        .where("PK_KEY_USR_ID", "=", userId)
+        .first(),
+    ]);
+
     let userFollowersResponseObject = [];
     if (userFollowers && userFollowers.length > 0) {
       userFollowersResponseObject = userFollowers.map((userFollower) => {
@@ -20,11 +56,6 @@ async function GetUserInformation(res, userId) {
         };
       });
     }
-
-    const userFollowings = await db
-      .select()
-      .from("follow")
-      .where("FK_KEY_USR_ID", "=", userId);
 
     let userFollowingsResponseObject = [];
     if (userFollowings && userFollowings.length > 0) {
@@ -37,11 +68,6 @@ async function GetUserInformation(res, userId) {
       });
     }
 
-    const personalProjects = await db
-      .select()
-      .from("project")
-      .where("FK_KEY_USR_ID", "=", userId)
-      .where("PROJECT_TYPE", "=", "SL");
     let personalProjectsResponseObject = [];
     if (personalProjects && personalProjects.length > 0) {
       personalProjectsResponseObject = await Promise.all(
@@ -57,17 +83,7 @@ async function GetUserInformation(res, userId) {
         })
       );
     }
-    const collaborateProjects = await db("project_collaborator")
-      .select(
-        "project.PK_KEY_PROJECT_ID as PK_KEY_PROJECT_ID",
-        "project.FK_KEY_PHOTO_ID as FK_KEY_PHOTO_ID"
-      )
-      .leftJoin(
-        "project",
-        "project.PK_KEY_PROJECT_ID",
-        "project_collaborator.FK_KEY_PROJECT_ID"
-      )
-      .where("project_collaborator.FK_KEY_USR_ID", userId);
+
     let collaborateProjectsResponseObject = [];
     if (collaborateProjects && collaborateProjects.length > 0) {
       collaborateProjectsResponseObject = await Promise.all(
@@ -83,19 +99,6 @@ async function GetUserInformation(res, userId) {
         })
       );
     }
-    const user = await db
-      .select(
-        "PK_KEY_USR_ID",
-        "TXT_FULL_NAME",
-        "TXT_MAJOR",
-        "TXT_SCHOOL",
-        "FK_KEY_PHOTO_ID",
-        "USR_EMAIL",
-        "USR_USERNAME"
-      )
-      .from("user_account")
-      .where("PK_KEY_USR_ID", "=", userId)
-      .first();
 
     if (!user) {
       return responseBuilder.BuildResponse(res, 404, {
